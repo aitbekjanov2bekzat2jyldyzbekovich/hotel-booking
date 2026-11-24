@@ -8,6 +8,14 @@ const activeLanguage = ref("РУ");
 const activeCurrency = ref("KGS");
 
 const languages = ["РУ", "КЫР", "ENG"];
+const logo = {
+  name: "Intourist",
+  description: "KYRGYZSTAN NARYN",
+};
+const tel = ref({
+  number: "+996312900000",
+  formatted: "+996 (312) 90-00-00",
+});
 const currencies = ["KGS", "USD"];
 const navigation = [
   { label: "Главная", hash: "" },
@@ -25,10 +33,7 @@ function closeMenu() {
   menuOpen.value = false;
 }
 
-watch(
-  () => route.fullPath,
-  closeMenu,
-);
+watch(() => route.fullPath, closeMenu);
 </script>
 
 <template>
@@ -36,28 +41,37 @@ watch(
     class="relative z-30 border-b border-slate-100 bg-white"
     @keydown.esc="closeMenu"
   >
-    <div class="container flex min-h-[68px] items-center justify-between gap-4 py-3 xl:min-h-[76px]">
+    <div
+      class="container flex min-h-[60px] items-center justify-between gap-3 py-2 sm:min-h-[68px] sm:gap-4 sm:py-3 xl:min-h-[76px]"
+    >
       <RouterLink
         to="/"
         class="flex shrink-0 flex-col leading-none"
         aria-label="HotelBooking — главная"
         @click="closeMenu"
       >
-        <span class="text-[18px] font-bold tracking-tight text-brand sm:text-xl">
-         Intourist
+        <span
+          class="text-[18px] font-bold tracking-tight text-brand sm:text-xl"
+        >
+          {{ logo.name }}
         </span>
         <span class="mt-1 text-[9px] font-semibold tracking-[0.2em] text-muted">
-          KYRGYZSTAN NARYN
+          {{ logo.description }}
         </span>
       </RouterLink>
 
-      <nav class="hidden items-center gap-4 xl:flex 2xl:gap-6" aria-label="Основная навигация">
+      <nav
+        class="hidden items-center gap-4 xl:flex 2xl:gap-6"
+        aria-label="Основная навигация"
+      >
         <RouterLink
           v-for="item in navigation"
           :key="item.label"
           :to="{ path: '/', hash: item.hash }"
           class="whitespace-nowrap py-2 text-[13px] font-medium transition-colors"
-          :class="isActive(item) ? 'text-brand' : 'text-slate-600 hover:text-brand'"
+          :class="
+            isActive(item) ? 'text-brand' : 'text-slate-600 hover:text-brand'
+          "
           :aria-current="isActive(item) ? 'page' : undefined"
         >
           {{ item.label }}
@@ -71,7 +85,11 @@ watch(
             :key="language"
             type="button"
             class="rounded-md px-1.5 py-1 text-[10px] font-semibold transition-colors"
-            :class="activeLanguage === language ? 'bg-page text-brand' : 'text-muted hover:text-ink'"
+            :class="
+              activeLanguage === language
+                ? 'bg-page text-brand'
+                : 'text-muted hover:text-ink'
+            "
             :aria-pressed="activeLanguage === language"
             @click="activeLanguage = language"
           >
@@ -87,7 +105,11 @@ watch(
             :key="currency"
             type="button"
             class="rounded-md px-1.5 py-1 text-[10px] font-semibold transition-colors"
-            :class="activeCurrency === currency ? 'bg-page text-brand' : 'text-muted hover:text-ink'"
+            :class="
+              activeCurrency === currency
+                ? 'bg-page text-brand'
+                : 'text-muted hover:text-ink'
+            "
             :aria-pressed="activeCurrency === currency"
             @click="activeCurrency = currency"
           >
@@ -96,7 +118,7 @@ watch(
         </div>
 
         <a
-          href="tel:+996312900000"
+          :href="`tel:${tel.number}`"
           class="flex items-center gap-2 whitespace-nowrap text-[12px] font-semibold text-ink transition-colors hover:text-brand"
           aria-label="Позвонить в гостиницу: +996 (312) 90-00-00"
         >
@@ -114,14 +136,16 @@ watch(
               d="M3 5.5A2.5 2.5 0 0 1 5.5 3h2.1a1 1 0 0 1 .97.76l1.02 4.1a1 1 0 0 1-.5 1.1l-1.55.88a11 11 0 0 0 4.62 4.62l.88-1.55a1 1 0 0 1 1.1-.5l4.1 1.02a1 1 0 0 1 .76.97v2.1a2.5 2.5 0 0 1-2.5 2.5h-.5C9.1 19 5 14.9 5 8v-.5Z"
             />
           </svg>
-          +996 (312) 90-00-00
+          {{ tel.formatted }}
         </a>
 
         <RouterLink
           :to="{ path: '/', hash: '#login' }"
           class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:border-brand/30 hover:text-brand"
         >
-          <span class="flex h-7 w-7 items-center justify-center rounded-full bg-page text-brand">
+          <span
+            class="flex h-7 w-7 items-center justify-center rounded-full bg-page text-brand"
+          >
             <svg
               class="h-4 w-4"
               viewBox="0 0 24 24"
@@ -174,16 +198,25 @@ watch(
     <div
       v-if="menuOpen"
       id="mobile-navigation"
-      class="absolute inset-x-0 top-full border-t border-slate-100 bg-white shadow-sm xl:hidden"
+      class="absolute inset-x-0 top-full max-h-[calc(100vh-60px)] overflow-y-auto border-t border-slate-100 bg-white shadow-sm sm:max-h-[calc(100vh-68px)] xl:hidden"
     >
-      <div class="container space-y-4 py-4">
-        <nav class="grid gap-1" aria-label="Мобильная навигация">
+      <div
+        class="container space-y-3 py-3 sm:max-w-[720px] sm:space-y-4 sm:py-4"
+      >
+        <nav
+          class="grid gap-1 sm:grid-cols-2 sm:gap-2"
+          aria-label="Мобильная навигация"
+        >
           <RouterLink
             v-for="item in navigation"
             :key="item.label"
             :to="{ path: '/', hash: item.hash }"
-            class="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
-            :class="isActive(item) ? 'bg-page text-brand' : 'text-slate-600 hover:bg-page hover:text-brand'"
+            class="min-h-11 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors sm:min-h-12"
+            :class="
+              isActive(item)
+                ? 'bg-page text-brand'
+                : 'text-slate-600 hover:bg-page hover:text-brand'
+            "
             :aria-current="isActive(item) ? 'page' : undefined"
             @click="closeMenu"
           >
@@ -191,14 +224,24 @@ watch(
           </RouterLink>
         </nav>
 
-        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-          <div class="flex items-center gap-1" role="group" aria-label="Язык">
+        <div
+          class="flex items-center justify-between gap-2 border-t border-slate-100 pt-3 sm:justify-start sm:gap-8 sm:pt-4"
+        >
+          <div
+            class="flex items-center gap-0.5 sm:gap-1"
+            role="group"
+            aria-label="Язык"
+          >
             <button
               v-for="language in languages"
               :key="language"
               type="button"
-              class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors"
-              :class="activeLanguage === language ? 'bg-page text-brand' : 'text-muted hover:text-ink'"
+              class="min-h-10 rounded-md px-2 py-1.5 text-xs font-semibold transition-colors sm:px-2.5"
+              :class="
+                activeLanguage === language
+                  ? 'bg-page text-brand'
+                  : 'text-muted hover:text-ink'
+              "
               :aria-pressed="activeLanguage === language"
               @click="activeLanguage = language"
             >
@@ -206,13 +249,21 @@ watch(
             </button>
           </div>
 
-          <div class="flex items-center gap-1" role="group" aria-label="Валюта">
+          <div
+            class="flex items-center gap-0.5 sm:gap-1"
+            role="group"
+            aria-label="Валюта"
+          >
             <button
               v-for="currency in currencies"
               :key="currency"
               type="button"
-              class="rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors"
-              :class="activeCurrency === currency ? 'bg-page text-brand' : 'text-muted hover:text-ink'"
+              class="min-h-10 rounded-md px-2 py-1.5 text-xs font-semibold transition-colors sm:px-2.5"
+              :class="
+                activeCurrency === currency
+                  ? 'bg-page text-brand'
+                  : 'text-muted hover:text-ink'
+              "
               :aria-pressed="activeCurrency === currency"
               @click="activeCurrency = currency"
             >
@@ -221,10 +272,12 @@ watch(
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+        <div
+          class="flex flex-col gap-3 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between sm:pt-4"
+        >
           <a
-            href="tel:+996312900000"
-            class="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-ink hover:text-brand"
+            :href="`tel:${tel.number}`"
+            class="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ink hover:text-brand"
           >
             <svg
               class="h-4 w-4 text-brand"
@@ -240,12 +293,12 @@ watch(
                 d="M3 5.5A2.5 2.5 0 0 1 5.5 3h2.1a1 1 0 0 1 .97.76l1.02 4.1a1 1 0 0 1-.5 1.1l-1.55.88a11 11 0 0 0 4.62 4.62l.88-1.55a1 1 0 0 1 1.1-.5l4.1 1.02a1 1 0 0 1 .76.97v2.1a2.5 2.5 0 0 1-2.5 2.5h-.5C9.1 19 5 14.9 5 8v-.5Z"
               />
             </svg>
-            +996 (312) 90-00-00
+            {{ tel.formatted }}
           </a>
 
           <RouterLink
             :to="{ path: '/', hash: '#login' }"
-            class="inline-flex min-h-10 items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand/90"
+            class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand/90 sm:min-w-[120px]"
             @click="closeMenu"
           >
             <svg

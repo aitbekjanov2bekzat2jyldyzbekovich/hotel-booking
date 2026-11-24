@@ -1,10 +1,16 @@
 <script setup>
-import heroImage from "../assets/issyk-kul-hero.jpg";
+import heroImage from "../assets/hero.webp";
+
+const title = "Найдите идеальный номер для вашего отдыха в Кыргызстане";
+const subtitle =
+  "Насладитесь спокойным отдыхом у озера Сон-куль среди величественных гор и природных пейзажей Кыргызстана.";
+const topTitle = "Горный курорт премиум-класса";
+const location = "Нарын, Кыргызстан";
 </script>
 
 <template>
   <section
-    class="relative isolate flex min-h-[480px] items-center overflow-hidden sm:min-h-[520px] lg:min-h-[560px]"
+    class="relative isolate flex min-h-screen min-h-[100svh] items-center overflow-hidden"
     aria-labelledby="hero-title"
   >
     <img
@@ -23,51 +29,35 @@ import heroImage from "../assets/issyk-kul-hero.jpg";
       class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/35 to-transparent"
       aria-hidden="true"
     ></div>
+    <div
+      class="absolute inset-x-0 bottom-0 z-[1] h-48 bg-gradient-to-t from-white via-white/70 to-transparent sm:h-56"
+      aria-hidden="true"
+    ></div>
 
-    <div class="container relative z-10 py-16 sm:py-20 lg:py-24">
+    <div class="container relative z-10 py-20 sm:py-24">
       <div class="max-w-4xl">
         <p
-          class="mb-5 inline-flex items-center rounded-full border border-white/25 bg-white/10 px-3.5 py-2 text-xs font-medium text-white backdrop-blur-sm sm:mb-6 sm:text-sm"
+          class="mb-4 inline-flex items-center rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[10px] font-medium text-white backdrop-blur-sm sm:mb-5 sm:px-3.5 sm:py-2 sm:text-sm"
         >
-          Горный курорт премиум-класса <span class="mx-2 text-white/70">•</span> Иссык-Куль
+          <span class="text-blue-300" aria-hidden="true">✦</span>
+          <span class="ml-1.5">{{ topTitle }}</span>
+          <span class="mx-1.5 text-white/70 sm:mx-2">•</span>
+          {{ location }}
         </p>
 
         <h1
           id="hero-title"
-          class="max-w-[840px] font-serif text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[44px]"
+          class="max-w-[840px] font-serif text-3xl font-bold leading-[1.08] tracking-tight text-white sm:text-4xl md:text-[40px] lg:text-[44px]"
         >
-          Найдите идеальный номер для вашего отдыха в Кыргызстане
+          {{ title }}
         </h1>
 
-        <p class="mt-5 max-w-xl text-sm leading-6 text-white/85 sm:mt-6 sm:text-base sm:leading-7">
-          Насладитесь спокойным отдыхом у озера Иссык-Куль среди величественных гор и природных
-          пейзажей Кыргызстана.
+        <p
+          class="mt-3 max-w-xl text-xs leading-5 text-white/90 sm:mt-4 sm:text-sm sm:leading-6 md:text-base md:leading-7"
+        >
+          {{ subtitle }}
         </p>
       </div>
     </div>
-
-    <p
-      class="absolute bottom-2 right-4 z-10 text-[10px] text-white/75 sm:bottom-3 sm:right-6"
-    >
-      Фото:
-      <a
-        href="https://commons.wikimedia.org/wiki/File:Issyk-Kul,_Kyrgyzstan_(42812885110).jpg"
-        target="_blank"
-        rel="noreferrer"
-        class="underline underline-offset-2 hover:text-white"
-      >
-        Ninara
-      </a>
-      ·
-      <a
-        href="https://creativecommons.org/licenses/by/2.0/"
-        target="_blank"
-        rel="noreferrer"
-        class="underline underline-offset-2 hover:text-white"
-      >
-        CC BY 2.0
-      </a>
-      (кадрировано)
-    </p>
   </section>
 </template>
