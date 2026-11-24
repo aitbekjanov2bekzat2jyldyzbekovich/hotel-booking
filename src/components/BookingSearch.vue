@@ -97,6 +97,7 @@ function submitSearch() {
 <template>
   <div class="bg-[#ffff]">
     <section
+      id="booking"
       class="container relative z-20 -mt-12 pb-8 sm:-mt-16 sm:pb-10 lg:-mt-24"
       :aria-label="content.sectionLabel"
     >
