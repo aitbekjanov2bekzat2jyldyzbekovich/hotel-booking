@@ -6,6 +6,7 @@ const route = useRoute();
 const menuOpen = ref(false);
 const activeLanguage = ref("РУ");
 const activeCurrency = ref("KGS");
+const loginPath = "/login";
 
 const languages = ["РУ", "КЫР", "ENG"];
 const logo = {
@@ -140,7 +141,7 @@ watch(() => route.fullPath, closeMenu);
         </a>
 
         <RouterLink
-          :to="{ path: '/', hash: '#login' }"
+          :to="loginPath"
           class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:border-brand/30 hover:text-brand"
         >
           <span
@@ -196,6 +197,7 @@ watch(() => route.fullPath, closeMenu);
     </div>
 
     <div
+      :data-aos="'zoom-in'"
       v-if="menuOpen"
       id="mobile-navigation"
       class="absolute inset-x-0 top-full max-h-[calc(100vh-60px)] overflow-y-auto border-t border-slate-100 bg-white shadow-sm sm:max-h-[calc(100vh-68px)] xl:hidden"
@@ -297,7 +299,7 @@ watch(() => route.fullPath, closeMenu);
           </a>
 
           <RouterLink
-            :to="{ path: '/', hash: '#login' }"
+            :to="loginPath"
             class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand/90 sm:min-w-[120px]"
             @click="closeMenu"
           >
