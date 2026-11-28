@@ -1,9 +1,14 @@
 <script setup>
 import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAuthStore } from "../authStore/index.js";
+import { showAppMessage } from "../utils/appMessage.js";
 
-const emit = defineEmits(["submit", "google"]);
+const authStore = useAuthStore();
+const route = useRoute();
+const router = useRouter();
 
-const isLogin = ref(false);
+const isLogin = ref(Boolean(route.query.redirect));
 const showPassword = ref(false);
 const showPasswordConfirmation = ref(false);
 const passwordConfirmationInput = ref(null);
@@ -59,25 +64,75 @@ async function setMode(login) {
   }
 }
 
-function submitForm() {
-  if (isLogin.value) {
-    emit("submit", {
-      mode: "login",
+async function submitForm() {
+  try {
+    if (isLogin.value) {
+      await authStore.signin({
+        email: form.email,
+        password: form.password,
+      });
+      showAppMessage("Аккаунт подтвержден. Вы вошли.", "success");
+      await navigateToProfile();
+      return;
+    }
+
+    await authStore.signup({
+      fullName: form.fullName,
       email: form.email,
       password: form.password,
     });
-    return;
+    showAppMessage(
+      "Мы отправили письмо для подтверждения аккаунта. Подтвердите адрес, затем нажмите «Я подтвердил аккаунт».",
+      "success",
+    );
+  } catch (error) {
+    showAppMessage(error.message, "error");
   }
+}
 
-  emit("submit", {
-    mode: "register",
-    fullName: form.fullName,
-    phone: `+996 ${form.phone}`,
-    email: form.email,
-    password: form.password,
-    acceptTerms: form.acceptTerms,
-    receiveOffers: form.receiveOffers,
-  });
+async function signInWithGoogle() {
+  try {
+    await authStore.signinWithGoogle();
+    showAppMessage("Вы вошли через Google.", "success");
+    await navigateToProfile();
+  } catch (error) {
+    showAppMessage(error.message, "error");
+  }
+}
+
+async function confirmAccount() {
+  try {
+    const confirmed = await authStore.confirmAccount();
+    showAppMessage(
+      confirmed
+        ? "Я подтвердил аккаунт — адрес электронной почты подтвержден."
+        : "Аккаунт еще не подтвержден. Сначала перейдите по ссылке из письма.",
+      confirmed ? "success" : "warning",
+    );
+    if (confirmed) {
+      await navigateToProfile();
+    }
+  } catch (error) {
+    showAppMessage(error.message, "error");
+  }
+}
+
+async function navigateToProfile() {
+  const redirect = route.query.redirect;
+  await router.replace(
+    typeof redirect === "string" && redirect.startsWith("/")
+      ? redirect
+      : { name: "profile" },
+  );
+}
+
+async function resendVerificationEmail() {
+  try {
+    await authStore.resendVerificationEmail();
+    showAppMessage("Письмо для подтверждения отправлено повторно.", "success");
+  } catch (error) {
+    showAppMessage(error.message, "error");
+  }
 }
 </script>
 
@@ -159,10 +214,37 @@ function submitForm() {
           </p>
         </div>
 
+        <div
+          v-if="authStore.user && !authStore.emailVerified"
+          class="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950"
+          role="status"
+        >
+          <p>Подтвердите адрес электронной почты, чтобы войти в аккаунт.</p>
+          <div class="mt-3 flex flex-wrap gap-3">
+            <button
+              type="button"
+              class="font-semibold underline underline-offset-2"
+              :disabled="authStore.loading"
+              @click="confirmAccount"
+            >
+              Я подтвердил аккаунт
+            </button>
+            <button
+              type="button"
+              class="font-semibold underline underline-offset-2"
+              :disabled="authStore.loading"
+              @click="resendVerificationEmail"
+            >
+              Отправить письмо повторно
+            </button>
+          </div>
+        </div>
+
         <button
           type="button"
-          class="mt-6 inline-flex min-h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-50 px-4 py-3 text-sm font-semibold text-ink transition-colors hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-          @click="emit('google')"
+          class="mt-6 inline-flex min-h-11 w-full items-center justify-center gap-3 rounded-lg bg-blue-50 px-4 py-3 text-sm font-semibold text-ink transition-colors hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:pointer-events-none disabled:opacity-60"
+          :disabled="authStore.loading"
+          @click="signInWithGoogle"
         >
           <svg class="h-4 w-4" viewBox="0 0 48 48" aria-hidden="true">
             <path
@@ -182,7 +264,7 @@ function submitForm() {
               d="M24 12c3 0 5.7 1 7.8 3.1l5.8-5.8C34.1 5.9 29.5 4 24 4A20 20 0 0 0 5.8 15.1l6.8 5.3C14.2 15.6 18.7 12 24 12Z"
             />
           </svg>
-          Продолжить с Google
+          {{ authStore.loading ? "Вход через Google..." : "Продолжить с Google" }}
         </button>
 
         <div class="my-6 flex items-center gap-3">
@@ -496,8 +578,18 @@ function submitForm() {
             </label>
           </div>
 
-          <button type="submit" class="auth-submit sm:col-span-2">
-            {{ isLogin ? "Войти" : "Зарегистрироваться и продолжить" }}
+          <button
+            type="submit"
+            class="auth-submit sm:col-span-2"
+            :disabled="authStore.loading"
+          >
+            {{
+              authStore.loading
+                ? "Подождите..."
+                : isLogin
+                  ? "Войти"
+                  : "Зарегистрироваться и продолжить"
+            }}
             <svg
               class="h-4 w-4"
               viewBox="0 0 24 24"

@@ -1,12 +1,28 @@
 <script setup>
-import { ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
+import { useAuthStore } from "../authStore/index.js";
+import { showAppMessage } from "../utils/appMessage.js";
 
 const route = useRoute();
+const authStore = useAuthStore();
 const menuOpen = ref(false);
 const activeLanguage = ref("РУ");
 const activeCurrency = ref("KGS");
 const loginPath = "/login";
+const isVerifiedUser = computed(
+  () => Boolean(authStore.user) && authStore.emailVerified,
+);
+const accountPath = computed(() =>
+  isVerifiedUser.value ? { name: "profile" } : loginPath,
+);
+const accountLabel = computed(() =>
+  isVerifiedUser.value
+    ? "Профиль"
+    : authStore.user
+      ? "Подтвердить аккаунт"
+      : "Войти",
+);
 
 const languages = ["РУ", "КЫР", "ENG"];
 const logo = {
@@ -35,6 +51,12 @@ function closeMenu() {
 }
 
 watch(() => route.fullPath, closeMenu);
+
+onMounted(() => {
+  authStore.initializeAuth().catch((error) => {
+    showAppMessage(error.message, "error");
+  });
+});
 </script>
 
 <template>
@@ -141,7 +163,7 @@ watch(() => route.fullPath, closeMenu);
         </a>
 
         <RouterLink
-          :to="loginPath"
+          :to="accountPath"
           class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[12px] font-semibold text-ink transition-colors hover:border-brand/30 hover:text-brand"
         >
           <span
@@ -159,7 +181,7 @@ watch(() => route.fullPath, closeMenu);
               <path stroke-linecap="round" d="M5.5 20a6.5 6.5 0 0 1 13 0" />
             </svg>
           </span>
-          Войти
+          {{ accountLabel }}
         </RouterLink>
       </div>
 
@@ -196,17 +218,17 @@ watch(() => route.fullPath, closeMenu);
       </button>
     </div>
 
-    <div
-      :data-aos="'zoom-in'"
-      v-if="menuOpen"
-      id="mobile-navigation"
-      class="absolute inset-x-0 top-full max-h-[calc(100vh-60px)] overflow-y-auto border-t border-slate-100 bg-white shadow-sm sm:max-h-[calc(100vh-68px)] xl:hidden"
-    >
+    <Transition name="mobile-menu">
       <div
-        class="container space-y-3 py-3 sm:max-w-[720px] sm:space-y-4 sm:py-4"
+        v-if="menuOpen"
+        id="mobile-navigation"
+        class="mobile-menu-panel border-t border-slate-100 bg-white shadow-sm xl:hidden"
       >
+        <div
+          class="mobile-menu-content container space-y-3 py-3 sm:max-w-[720px] sm:space-y-4 sm:py-4"
+        >
         <nav
-          class="grid gap-1 sm:grid-cols-2 sm:gap-2"
+          class="mobile-menu-item grid gap-1 sm:grid-cols-2 sm:gap-2"
           aria-label="Мобильная навигация"
         >
           <RouterLink
@@ -227,7 +249,7 @@ watch(() => route.fullPath, closeMenu);
         </nav>
 
         <div
-          class="flex items-center justify-between gap-2 border-t border-slate-100 pt-3 sm:justify-start sm:gap-8 sm:pt-4"
+          class="mobile-menu-item flex items-center justify-between gap-2 border-t border-slate-100 pt-3 sm:justify-start sm:gap-8 sm:pt-4"
         >
           <div
             class="flex items-center gap-0.5 sm:gap-1"
@@ -275,7 +297,7 @@ watch(() => route.fullPath, closeMenu);
         </div>
 
         <div
-          class="flex flex-col gap-3 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between sm:pt-4"
+          class="mobile-menu-item flex flex-col gap-3 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between sm:pt-4"
         >
           <a
             :href="`tel:${tel.number}`"
@@ -299,7 +321,7 @@ watch(() => route.fullPath, closeMenu);
           </a>
 
           <RouterLink
-            :to="loginPath"
+            :to="accountPath"
             class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand/90 sm:min-w-[120px]"
             @click="closeMenu"
           >
@@ -314,10 +336,11 @@ watch(() => route.fullPath, closeMenu);
               <circle cx="12" cy="8" r="3.25" />
               <path stroke-linecap="round" d="M5.5 20a6.5 6.5 0 0 1 13 0" />
             </svg>
-            Войти
+            {{ accountLabel }}
           </RouterLink>
+          </div>
         </div>
       </div>
-    </div>
+    </Transition>
   </header>
 </template>
